@@ -1,0 +1,147 @@
+/* OpenTermix - dark theme. Minimal, flat, low-contrast chrome so the terminal
+   content stays the focal point. */
+
+QWidget {
+    background-color: #1e2127;
+    color: #d7dae0;
+    selection-background-color: #3d5afe;
+    selection-color: #ffffff;
+}
+
+QMainWindow::separator {
+    background: #14161b;
+    width: 3px;
+    height: 3px;
+}
+
+QMenuBar {
+    background: #23262e;
+    border-bottom: 1px solid #14161b;
+}
+QMenuBar::item:selected { background: #313641; }
+
+QMenu {
+    background: #23262e;
+    border: 1px solid #14161b;
+}
+QMenu::item:selected { background: #313641; }
+
+QToolBar {
+    background: #23262e;
+    border: none;
+    spacing: 4px;
+    padding: 2px;
+}
+QToolButton {
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+QToolButton:hover { background: #313641; }
+QToolButton:checked { background: #3d5afe; color: #ffffff; }
+
+QDockWidget {
+    titlebar-close-icon: none;
+}
+QDockWidget::title {
+    background: #23262e;
+    padding: 6px 8px;
+    color: #d7dae0;
+    border-top: 1px solid #3a3f4b;
+    border-bottom: 1px solid #3a3f4b;
+}
+
+QTabWidget::pane { border: none; }
+QTabBar { min-height: 32px; }
+QTabBar::tab {
+    background: #23262e;
+    padding: 8px 12px;
+    min-height: 16px;
+    border: none;
+}
+QTabBar::tab:selected { background: #1e2127; border-bottom: 2px solid #3d5afe; }
+QTabBar::tab:hover { background: #313641; }
+
+QTreeView, QTreeWidget, QLineEdit, QSpinBox {
+    background: #191c21;
+    border: 1px solid #14161b;
+    border-radius: 4px;
+    padding: 2px;
+}
+QTreeView::item:selected, QTreeWidget::item:selected {
+    background: #3d5afe;
+    color: #ffffff;
+}
+
+QHeaderView::section {
+    background: #23262e;
+    border: none;
+    padding: 4px;
+}
+
+/* Files panel: thin vertical separators between columns. */
+#FileBrowserTree::item {
+    border-right: 1px solid #2a2e36;
+}
+#FileBrowserTree QHeaderView::section {
+    border-right: 1px solid #14161b;
+}
+
+QPushButton {
+    background: #313641;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 12px;
+}
+QPushButton:hover { background: #3a404c; }
+QPushButton:default { background: #3d5afe; color: #ffffff; }
+
+QScrollBar:vertical { background: #191c21; width: 10px; margin: 0; }
+QScrollBar::handle:vertical { background: #3a404c; border-radius: 5px; min-height: 24px; }
+QScrollBar::add-line, QScrollBar::sub-line { height: 0; }
+
+/* Tab bar corner buttons (new / split) */
+#TabNewButton, #TabSplitButton, #TabClearButton {
+    color: #d7dae0;
+    padding: 2px 6px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+}
+#TabNewButton:hover, #TabSplitButton:hover, #TabClearButton:hover { background: #313641; }
+#TabSplitButton::menu-indicator { image: none; width: 0; }
+
+/* Active editor group accent */
+TerminalGroup[activeGroup="true"]::pane { border-top: 2px solid #3d5afe; }
+
+/* Terminal surface background is injected at runtime to match the selected
+   colour scheme (see MainWindow::applyTheme), which fixes the colour shift on
+   selection without hard-coding a single scheme's background here. */
+
+/* Empty-state placeholder */
+#PlaceholderHint { color: #9aa0aa; font-size: 14px; }
+#PlaceholderButton { padding: 8px 18px; }
+
+/* Settings tab */
+#SettingsTitle { font-size: 18px; font-weight: bold; }
+#SettingsHint { color: #9aa0aa; }
+
+/* Split-pane mini control panel */
+#TerminalHeader {
+    background: #23262e;
+    border-bottom: 1px solid #14161b;
+}
+#TerminalTitle {
+    color: #9aa0aa;
+    font-size: 11px;
+}
+#TerminalClose {
+    color: #d7dae0;
+    padding: 0 6px;
+    font-size: 14px;
+    border: none;
+}
+#TerminalClose:hover {
+    background: #d33;
+    color: #ffffff;
+    border-radius: 3px;
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>styles/dark.qss</file>
+        <file>styles/light.qss</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>icons/opentermix_16.png</file>
+        <file>icons/opentermix_32.png</file>
+        <file>icons/opentermix_48.png</file>
+        <file>icons/opentermix_256.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>icons/color/folder.svg</file>
+        <file>icons/color/view-file.svg</file>
+        <file>icons/on-dark/add.svg</file>
+        <file>icons/on-dark/clear.svg</file>
+        <file>icons/on-dark/close.svg</file>
+        <file>icons/on-dark/delete.svg</file>
+        <file>icons/on-dark/download.svg</file>
+        <file>icons/on-dark/edit.svg</file>
+        <file>icons/on-dark/folder-new.svg</file>
+        <file>icons/on-dark/hidden.svg</file>
+        <file>icons/on-dark/refresh.svg</file>
+        <file>icons/on-dark/split.svg</file>
+        <file>icons/on-dark/tab-new.svg</file>
+        <file>icons/on-dark/up.svg</file>
+        <file>icons/on-dark/visible.svg</file>
+        <file>icons/on-light/add.svg</file>
+        <file>icons/on-light/clear.svg</file>
+        <file>icons/on-light/close.svg</file>
+        <file>icons/on-light/delete.svg</file>
+        <file>icons/on-light/download.svg</file>
+        <file>icons/on-light/edit.svg</file>
+        <file>icons/on-light/folder-new.svg</file>
+        <file>icons/on-light/hidden.svg</file>
+        <file>icons/on-light/refresh.svg</file>
+        <file>icons/on-light/split.svg</file>
+        <file>icons/on-light/tab-new.svg</file>
+        <file>icons/on-light/up.svg</file>
+        <file>icons/on-light/visible.svg</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,26 @@
+# CMake build directory
+/build/
+obj-*/
+*.user
+*.autosave
+CMakeCache.txt
+CMakeFiles/
+
+# Editor / tooling
+/.claude/
+
+# Debian packaging artifacts (dpkg-buildpackage output)
+/debian/.debhelper/
+/debian/opentermix/
+/debian/tmp/
+/debian/files
+/debian/*.substvars
+/debian/*.debhelper.log
+/debian/debhelper-build-stamp
+*.deb
+*.buildinfo
+*.changes
+*.dsc
+*.tar.gz
+*.tar.xz
+*.build
