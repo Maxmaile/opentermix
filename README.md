@@ -10,6 +10,8 @@ Built with **Qt 6** (C++ in a deliberately simple, C-like style),
 [QTermWidget](https://github.com/lxqt/qtermwidget) for the embedded terminal,
 and [libssh](https://www.libssh.org/) for the SFTP browser.
 
+![OpenTermix](resources/opentermix.png)
+
 ## Features (MVP - SSH core)
 
 - Tabbed embedded terminal (local shell and SSH), running your system shell.
