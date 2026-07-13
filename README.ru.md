@@ -10,6 +10,8 @@ OpenTermix — открытый лёгкий терминал в духе MobaXt
 использует [QTermWidget](https://github.com/lxqt/qtermwidget) для встроенного
 терминала и [libssh](https://www.libssh.org/) для SFTP-браузера.
 
+![OpenTermix](resources/opentermix.png)
+
 ## Возможности (MVP — SSH-ядро)
 
 - Вкладочный встроенный терминал (локальная оболочка и SSH), запускает вашу
