@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=OpenTermix
+GenericName=Terminal emulator
+Comment=Open-source lightweight MobaXterm-like terminal
+Exec=opentermix
+Icon=opentermix
+Categories=System;TerminalEmulator;
+Terminal=false
+StartupWMClass=OpenTermix
