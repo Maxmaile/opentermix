@@ -1,6 +1,7 @@
 #include "sessions/SessionPanel.h"
 
 #include <QAction>
+#include <QCursor>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMenu>
@@ -14,6 +15,8 @@
 #include "sessions/SessionEditorDialog.h"
 #include "sessions/SessionTreeModel.h"
 #include "sessions/SshConfigParser.h"
+#include "sessions/TunnelDialog.h"
+#include "sessions/TunnelManager.h"
 #include "sftp/SftpClient.h"
 
 SessionPanel::SessionPanel(QWidget *parent)
@@ -21,7 +24,10 @@ SessionPanel::SessionPanel(QWidget *parent)
     , model_(new SessionTreeModel(this))
     , view_(new QTreeView(this))
     , configPath_(SshConfigParser::defaultConfigPath())
+    , tunnels_(new TunnelManager(this))
 {
+    connect(tunnels_, &TunnelManager::tunnelFailed, this, &SessionPanel::onTunnelFailed);
+
     view_->setModel(model_);
     view_->setHeaderHidden(true);
     view_->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -34,21 +40,23 @@ SessionPanel::SessionPanel(QWidget *parent)
     view_->setDragDropMode(QAbstractItemView::DragDrop);
     view_->setDefaultDropAction(Qt::MoveAction);
 
-    auto *toolbar = new QToolBar(this);
-    toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    addAction_ = toolbar->addAction(tr("Add"), this, &SessionPanel::addSession);
-    newFolderAction_ = toolbar->addAction(tr("New folder"), this, &SessionPanel::newFolder);
-    editAction_ = toolbar->addAction(tr("Edit"), this, &SessionPanel::editSession);
-    refreshAction_ = toolbar->addAction(tr("Refresh"), this, &SessionPanel::reload);
-    deleteAction_ = toolbar->addAction(tr("Delete"), this, &SessionPanel::deleteSession);
-    for (QAction *a : {addAction_, newFolderAction_, editAction_, refreshAction_, deleteAction_})
+    toolbar_ = new QToolBar(this);
+    toolbar_->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    addAction_ = toolbar_->addAction(tr("Add"), this, &SessionPanel::addSession);
+    newFolderAction_ = toolbar_->addAction(tr("New folder"), this, &SessionPanel::newFolder);
+    editAction_ = toolbar_->addAction(tr("Edit"), this, &SessionPanel::editSession);
+    refreshAction_ = toolbar_->addAction(tr("Refresh"), this, &SessionPanel::reload);
+    tunnelAction_ = toolbar_->addAction(tr("Tunnel"), this, &SessionPanel::showTunnelMenu);
+    deleteAction_ = toolbar_->addAction(tr("Delete"), this, &SessionPanel::deleteSession);
+    for (QAction *a : {addAction_, newFolderAction_, editAction_, refreshAction_, tunnelAction_,
+                       deleteAction_})
         a->setToolTip(a->text());
     applyIcons();
 
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-    layout->addWidget(toolbar);
+    layout->addWidget(toolbar_);
     layout->addWidget(view_);
 
     connect(view_, &QTreeView::activated, this, &SessionPanel::onActivated);
@@ -65,7 +73,13 @@ void SessionPanel::applyIcons()
     newFolderAction_->setIcon(Icons::action(QStringLiteral("folder-new")));
     editAction_->setIcon(Icons::action(QStringLiteral("edit")));
     refreshAction_->setIcon(Icons::action(QStringLiteral("refresh")));
+    tunnelAction_->setIcon(Icons::action(QStringLiteral("tunnel")));
     deleteAction_->setIcon(Icons::action(QStringLiteral("delete")));
+}
+
+void SessionPanel::stopAllTunnels()
+{
+    tunnels_->stopAll();
 }
 
 void SessionPanel::reload()
@@ -340,4 +354,52 @@ void SessionPanel::showContextMenu(const QPoint &pos)
     menu.addAction(tr("New folder"), this, &SessionPanel::newFolder);
     menu.addAction(tr("Refresh"), this, &SessionPanel::reload);
     menu.exec(view_->viewport()->mapToGlobal(pos));
+}
+
+void SessionPanel::showTunnelMenu()
+{
+    QMenu menu(this);
+
+    const QList<Session> sessions = model_->sessions();
+    if (sessions.isEmpty()) {
+        menu.addAction(tr("No sessions configured"))->setEnabled(false);
+    } else {
+        for (const Session &s : sessions) {
+            menu.addAction(tr("New tunnel via \"%1\"...").arg(s.displayName()),
+                           this, [this, s] { startTunnelVia(s); });
+        }
+    }
+
+    const QList<TunnelInfo> active = tunnels_->activeTunnels();
+    if (!active.isEmpty()) {
+        menu.addSeparator();
+        menu.addAction(tr("Active tunnels"))->setEnabled(false);
+        for (const TunnelInfo &t : active) {
+            const int id = t.id;
+            menu.addAction(tr("Stop: %1 via %2").arg(t.spec.describe(), t.gateway.displayName()),
+                           this, [this, id] { tunnels_->stopTunnel(id); });
+        }
+    }
+
+    QWidget *button = toolbar_->widgetForAction(tunnelAction_);
+    const QPoint pos = button ? button->mapToGlobal(button->rect().bottomLeft())
+                              : QCursor::pos();
+    menu.exec(pos);
+}
+
+void SessionPanel::startTunnelVia(const Session &gateway)
+{
+    TunnelDialog dialog(gateway, this);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    QString error;
+    if (tunnels_->startTunnel(gateway, dialog.spec(), &error) < 0)
+        QMessageBox::warning(this, tr("Tunnel"), tr("Could not start tunnel: %1").arg(error));
+}
+
+void SessionPanel::onTunnelFailed(int /*id*/, const QString &message)
+{
+    QMessageBox::warning(this, tr("Tunnel"),
+                         tr("A tunnel stopped unexpectedly:\n%1").arg(message));
 }

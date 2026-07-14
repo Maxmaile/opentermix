@@ -6,7 +6,9 @@
 #include "sessions/SessionLayout.h"
 
 class SessionTreeModel;
+class TunnelManager;
 class QAction;
+class QToolBar;
 class QTreeView;
 class QModelIndex;
 class QPoint;
@@ -19,6 +21,7 @@ public:
 
     void reload();
     void applyIcons(); // re-tint toolbar icons after a theme change
+    void stopAllTunnels(); // forwarded to the TunnelManager, e.g. on app shutdown
 
 signals:
     void connectRequested(const Session &s);
@@ -34,6 +37,9 @@ private slots:
     void onSessionDropped(int sessionRow, const QString &group);
     void onActivated(const QModelIndex &index);
     void showContextMenu(const QPoint &pos);
+    void showTunnelMenu();
+    void startTunnelVia(const Session &gateway);
+    void onTunnelFailed(int id, const QString &message);
 
 private:
     bool currentSession(Session &out, int &row) const;
@@ -47,10 +53,13 @@ private:
     QTreeView *view_;
     QString configPath_;
     SessionLayout layout_; // folders + grouping, kept out of ~/.ssh/config
+    TunnelManager *tunnels_;
+    QToolBar *toolbar_ = nullptr;
 
     QAction *addAction_ = nullptr;
     QAction *newFolderAction_ = nullptr;
     QAction *editAction_ = nullptr;
     QAction *refreshAction_ = nullptr;
+    QAction *tunnelAction_ = nullptr;
     QAction *deleteAction_ = nullptr;
 };
