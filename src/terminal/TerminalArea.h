@@ -22,6 +22,7 @@ public:
     TerminalWidget *newLocalTab();
     TerminalWidget *newSshTab(const Session &s);
     void openContentTab(QWidget *content, const QString &title);
+    void closeContentTab(QWidget *content); // programmatic removal, bypasses any close confirmation
     void splitActive(Qt::Orientation orientation);
 
     void setColorScheme(const QString &scheme);
@@ -33,6 +34,7 @@ signals:
     void terminalOpened(TerminalWidget *terminal, Session session);
     void terminalClosing(TerminalWidget *terminal);
     void currentTerminalChanged(TerminalWidget *terminal);
+    void tunnelsTabClosing();
 
 private slots:
     void onFocusChanged(QWidget *old, QWidget *now);

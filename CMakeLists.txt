@@ -37,6 +37,7 @@ set(SOURCES
     src/sessions/SshArgs.cpp
     src/sessions/TunnelManager.cpp
     src/sessions/TunnelDialog.cpp
+    src/sessions/TunnelsTabWidget.cpp
     src/sftp/SftpClient.cpp
     src/sftp/SftpBrowserWidget.cpp
 )
@@ -61,6 +62,7 @@ set(HEADERS
     src/sessions/SshArgs.h
     src/sessions/TunnelManager.h
     src/sessions/TunnelDialog.h
+    src/sessions/TunnelsTabWidget.h
     src/sftp/SftpClient.h
     src/sftp/SftpBrowserWidget.h
 )

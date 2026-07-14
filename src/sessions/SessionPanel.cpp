@@ -1,9 +1,9 @@
 #include "sessions/SessionPanel.h"
 
 #include <QAction>
-#include <QCursor>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QItemSelectionModel>
 #include <QMenu>
 #include <QMessageBox>
 #include <QThread>
@@ -27,6 +27,7 @@ SessionPanel::SessionPanel(QWidget *parent)
     , tunnels_(new TunnelManager(this))
 {
     connect(tunnels_, &TunnelManager::tunnelFailed, this, &SessionPanel::onTunnelFailed);
+    connect(tunnels_, &TunnelManager::tunnelsChanged, this, &SessionPanel::tunnelsChanged);
 
     view_->setModel(model_);
     view_->setHeaderHidden(true);
@@ -46,7 +47,8 @@ SessionPanel::SessionPanel(QWidget *parent)
     newFolderAction_ = toolbar_->addAction(tr("New folder"), this, &SessionPanel::newFolder);
     editAction_ = toolbar_->addAction(tr("Edit"), this, &SessionPanel::editSession);
     refreshAction_ = toolbar_->addAction(tr("Refresh"), this, &SessionPanel::reload);
-    tunnelAction_ = toolbar_->addAction(tr("Tunnel"), this, &SessionPanel::showTunnelMenu);
+    tunnelAction_ = toolbar_->addAction(tr("Tunnel"), this, &SessionPanel::openTunnelDialog);
+    tunnelAction_->setEnabled(false); // enabled once a session is selected, see below
     deleteAction_ = toolbar_->addAction(tr("Delete"), this, &SessionPanel::deleteSession);
     for (QAction *a : {addAction_, newFolderAction_, editAction_, refreshAction_, tunnelAction_,
                        deleteAction_})
@@ -63,6 +65,8 @@ SessionPanel::SessionPanel(QWidget *parent)
     connect(view_, &QTreeView::customContextMenuRequested,
             this, &SessionPanel::showContextMenu);
     connect(model_, &SessionTreeModel::sessionDropped, this, &SessionPanel::onSessionDropped);
+    connect(view_->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &SessionPanel::updateTunnelActionEnabled);
 
     reload();
 }
@@ -108,6 +112,14 @@ void SessionPanel::reload()
 
     model_->setSessions(sessions, layout_.folders());
     view_->expandAll();
+    updateTunnelActionEnabled(); // reload() can invalidate the current selection
+}
+
+void SessionPanel::updateTunnelActionEnabled()
+{
+    Session s;
+    int row;
+    tunnelAction_->setEnabled(currentSession(s, row));
 }
 
 bool SessionPanel::currentSession(Session &out, int &row) const
@@ -356,35 +368,23 @@ void SessionPanel::showContextMenu(const QPoint &pos)
     menu.exec(view_->viewport()->mapToGlobal(pos));
 }
 
-void SessionPanel::showTunnelMenu()
+void SessionPanel::openTunnelDialog()
 {
-    QMenu menu(this);
+    Session s;
+    int row;
+    if (!currentSession(s, row))
+        return; // toolbar button is disabled in this case, but guard anyway
+    startTunnelVia(s);
+}
 
-    const QList<Session> sessions = model_->sessions();
-    if (sessions.isEmpty()) {
-        menu.addAction(tr("No sessions configured"))->setEnabled(false);
-    } else {
-        for (const Session &s : sessions) {
-            menu.addAction(tr("New tunnel via \"%1\"...").arg(s.displayName()),
-                           this, [this, s] { startTunnelVia(s); });
-        }
-    }
+QList<TunnelInfo> SessionPanel::activeTunnels() const
+{
+    return tunnels_->activeTunnels();
+}
 
-    const QList<TunnelInfo> active = tunnels_->activeTunnels();
-    if (!active.isEmpty()) {
-        menu.addSeparator();
-        menu.addAction(tr("Active tunnels"))->setEnabled(false);
-        for (const TunnelInfo &t : active) {
-            const int id = t.id;
-            menu.addAction(tr("Stop: %1 via %2").arg(t.spec.describe(), t.gateway.displayName()),
-                           this, [this, id] { tunnels_->stopTunnel(id); });
-        }
-    }
-
-    QWidget *button = toolbar_->widgetForAction(tunnelAction_);
-    const QPoint pos = button ? button->mapToGlobal(button->rect().bottomLeft())
-                              : QCursor::pos();
-    menu.exec(pos);
+void SessionPanel::stopTunnel(int id)
+{
+    tunnels_->stopTunnel(id);
 }
 
 void SessionPanel::startTunnelVia(const Session &gateway)

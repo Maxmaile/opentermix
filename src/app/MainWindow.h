@@ -13,6 +13,7 @@ class SettingsWidget;
 class SftpBrowserWidget;
 class TerminalArea;
 class TerminalWidget;
+class TunnelsTabWidget;
 class QAction;
 class QDockWidget;
 class QStackedWidget;
@@ -40,6 +41,8 @@ private slots:
     void changeColorScheme(const QString &scheme);
     void changeLanguage(const QString &code);
     void about();
+    void onTunnelsChanged();
+    void onTunnelsTabClosing();
 
 private:
     void createActions();
@@ -63,6 +66,7 @@ private:
     QAction *broadcastAction_ = nullptr;
     QAction *darkAction_ = nullptr;
     QPointer<SettingsWidget> settingsWidget_; // the one open Settings tab, if any
+    QPointer<TunnelsTabWidget> tunnelsTab_;   // the one open Tunnels tab, if any
     bool dark_ = true;
     QString terminalScheme_;
     QFont terminalFont_;

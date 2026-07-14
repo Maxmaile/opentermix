@@ -3,11 +3,13 @@
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QTabBar>
 #include <QToolButton>
 
 #include "app/Icons.h"
+#include "sessions/TunnelsTabWidget.h"
 #include "terminal/MultiExec.h"
 #include "terminal/TerminalWidget.h"
 
@@ -136,6 +138,15 @@ void TerminalGroup::addContentTab(QWidget *content, const QString &title)
 void TerminalGroup::handleClose(int index)
 {
     QWidget *w = widget(index);
+    if (auto *tunnels = qobject_cast<TunnelsTabWidget *>(w)) {
+        if (!tunnels->isEmpty()
+            && QMessageBox::question(this, tr("Close tunnels"),
+                                     tr("Closing this tab will terminate all active tunnels. "
+                                        "Continue?"))
+                   != QMessageBox::Yes)
+            return; // veto: leave the tab open
+        emit tunnelsTabClosing();
+    }
     if (auto *t = qobject_cast<TerminalWidget *>(w))
         emit terminalClosing(t);
     removeTab(index);
