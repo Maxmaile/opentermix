@@ -4,9 +4,9 @@
 
 #include "sessions/Session.h"
 #include "sessions/SessionLayout.h"
+#include "sessions/TunnelManager.h"
 
 class SessionTreeModel;
-class TunnelManager;
 class QAction;
 class QToolBar;
 class QTreeView;
@@ -23,9 +23,15 @@ public:
     void applyIcons(); // re-tint toolbar icons after a theme change
     void stopAllTunnels(); // forwarded to the TunnelManager, e.g. on app shutdown
 
+    // Narrow forwarding to the private TunnelManager, for MainWindow to build
+    // the "Tunnels" tab without owning tunnel lifecycle itself.
+    QList<TunnelInfo> activeTunnels() const;
+    void stopTunnel(int id);
+
 signals:
     void connectRequested(const Session &s);
     void sftpRequested(const Session &s);
+    void tunnelsChanged(); // forwarded from TunnelManager::tunnelsChanged
 
 private slots:
     void addSession();
@@ -37,9 +43,10 @@ private slots:
     void onSessionDropped(int sessionRow, const QString &group);
     void onActivated(const QModelIndex &index);
     void showContextMenu(const QPoint &pos);
-    void showTunnelMenu();
+    void openTunnelDialog(); // Tunnel toolbar button: dialog for the selected session
     void startTunnelVia(const Session &gateway);
     void onTunnelFailed(int id, const QString &message);
+    void updateTunnelActionEnabled(); // toolbar button enabled only with a session selected
 
 private:
     bool currentSession(Session &out, int &row) const;

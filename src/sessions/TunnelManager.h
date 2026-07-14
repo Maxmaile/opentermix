@@ -9,8 +9,8 @@
 
 // Public, copy-safe snapshot of one running tunnel. Deliberately has no
 // QProcess handle: callers only need to display/identify tunnels (see
-// SessionPanel::showTunnelMenu), never reach into the underlying process, so
-// there is nothing here that can outlive it and dangle.
+// TunnelsTabWidget), never reach into the underlying process, so there is
+// nothing here that can outlive it and dangle.
 struct TunnelInfo {
     int id = 0;
     Session gateway;

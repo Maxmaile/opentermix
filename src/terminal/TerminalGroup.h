@@ -35,6 +35,7 @@ signals:
     void terminalOpened(TerminalWidget *terminal, Session session);
     void terminalClosing(TerminalWidget *terminal);
     void currentTabChanged();
+    void tunnelsTabClosing(); // the Tunnels tab is about to close (user confirmed)
 
 private slots:
     void handleClose(int index);

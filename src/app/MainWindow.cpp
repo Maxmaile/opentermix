@@ -28,6 +28,7 @@
 #include "app/SettingsWidget.h"
 #include "terminal/ColorSchemeStore.h"
 #include "sessions/SessionPanel.h"
+#include "sessions/TunnelsTabWidget.h"
 #include "sftp/SftpBrowserWidget.h"
 #include "terminal/MultiExec.h"
 #include "terminal/TerminalArea.h"
@@ -67,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(area_, &TerminalArea::terminalClosing, this, &MainWindow::onTerminalClosing);
     connect(area_, &TerminalArea::currentTerminalChanged, this,
             &MainWindow::onCurrentTerminalChanged);
+    connect(area_, &TerminalArea::tunnelsTabClosing, this, &MainWindow::onTunnelsTabClosing);
 
     restoreLayout(); // geometry + dock/toolbar state (needs objectNames)
     applyTheme();
@@ -96,6 +98,7 @@ void MainWindow::createDocks()
 
     connect(sessions_, &SessionPanel::connectRequested, this, &MainWindow::onConnectRequested);
     connect(sessions_, &SessionPanel::sftpRequested, this, &MainWindow::onSftpRequested);
+    connect(sessions_, &SessionPanel::tunnelsChanged, this, &MainWindow::onTunnelsChanged);
 }
 
 void MainWindow::createActions()
@@ -217,6 +220,33 @@ void MainWindow::openSettings()
     connect(settings, &SettingsWidget::colorSchemeChanged, this, &MainWindow::changeColorScheme);
     connect(settings, &SettingsWidget::languageChangeRequested, this, &MainWindow::changeLanguage);
     area_->openContentTab(settings, tr("Settings"));
+}
+
+void MainWindow::onTunnelsChanged()
+{
+    const QList<TunnelInfo> tunnels = sessions_->activeTunnels();
+    if (tunnels.isEmpty()) {
+        if (tunnelsTab_)
+            area_->closeContentTab(tunnelsTab_);
+        return;
+    }
+    if (!tunnelsTab_) {
+        auto *tab = new TunnelsTabWidget(this);
+        tunnelsTab_ = tab;
+        connect(tab, &TunnelsTabWidget::stopRequested, sessions_, &SessionPanel::stopTunnel);
+        area_->openContentTab(tab, tr("Tunnels"));
+    }
+    tunnelsTab_->setTunnels(tunnels);
+}
+
+void MainWindow::onTunnelsTabClosing()
+{
+    // TerminalGroup::handleClose() is already removing this tab (the user just
+    // confirmed) - clear our tracking pointer first so the tunnelsChanged()
+    // fallout from stopAllTunnels() below doesn't try to remove it a second
+    // time (see MainWindow::onTunnelsChanged()).
+    tunnelsTab_ = nullptr;
+    sessions_->stopAllTunnels();
 }
 
 void MainWindow::changeLanguage(const QString &code)

@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QSplitter>
 #include <QStyle>
+#include <QTabWidget>
 #include <QVBoxLayout>
 
 #include "terminal/TerminalGroup.h"
@@ -74,6 +75,7 @@ TerminalGroup *TerminalArea::createGroup()
             [this](TerminalWidget *t, Session s) { emit terminalOpened(t, s); });
     connect(g, &TerminalGroup::terminalClosing, this,
             [this](TerminalWidget *t) { emit terminalClosing(t); });
+    connect(g, &TerminalGroup::tunnelsTabClosing, this, [this] { emit tunnelsTabClosing(); });
     connect(g, &TerminalGroup::currentTabChanged, this, [this, g] {
         if (g == active_)
             emitCurrentTerminal();
@@ -113,6 +115,24 @@ TerminalWidget *TerminalArea::newSshTab(const Session &s)
 void TerminalArea::openContentTab(QWidget *content, const QString &title)
 {
     ensureActiveGroup()->addContentTab(content, title);
+}
+
+void TerminalArea::closeContentTab(QWidget *content)
+{
+    // Same "walk up to the owning QTabWidget" approach MainWindow::openSettings()
+    // uses to re-find an already-open tab; here it's used to remove one
+    // programmatically (e.g. the last tunnel stopped) without going through
+    // TerminalGroup::handleClose()'s user-facing close confirmation.
+    for (QWidget *p = content->parentWidget(); p; p = p->parentWidget()) {
+        if (auto *tabs = qobject_cast<QTabWidget *>(p)) {
+            const int idx = tabs->indexOf(content);
+            if (idx >= 0) {
+                tabs->removeTab(idx);
+                content->deleteLater();
+            }
+            break;
+        }
+    }
 }
 
 void TerminalArea::splitActive(Qt::Orientation orientation)
