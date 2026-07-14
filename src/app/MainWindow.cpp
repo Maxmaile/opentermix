@@ -442,6 +442,8 @@ void MainWindow::saveSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (sessions_)
+        sessions_->stopAllTunnels();
     saveSettings();
     QMainWindow::closeEvent(event);
 }

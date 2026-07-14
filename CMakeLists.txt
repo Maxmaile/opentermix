@@ -34,6 +34,9 @@ set(SOURCES
     src/sessions/SessionPanel.cpp
     src/sessions/SessionLayout.cpp
     src/sessions/SessionEditorDialog.cpp
+    src/sessions/SshArgs.cpp
+    src/sessions/TunnelManager.cpp
+    src/sessions/TunnelDialog.cpp
     src/sftp/SftpClient.cpp
     src/sftp/SftpBrowserWidget.cpp
 )
@@ -54,6 +57,10 @@ set(HEADERS
     src/sessions/SessionPanel.h
     src/sessions/SessionLayout.h
     src/sessions/SessionEditorDialog.h
+    src/sessions/Tunnel.h
+    src/sessions/SshArgs.h
+    src/sessions/TunnelManager.h
+    src/sessions/TunnelDialog.h
     src/sftp/SftpClient.h
     src/sftp/SftpBrowserWidget.h
 )

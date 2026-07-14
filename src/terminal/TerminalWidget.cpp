@@ -1,6 +1,5 @@
 #include "terminal/TerminalWidget.h"
 
-#include <QDir>
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QKeyEvent>
@@ -12,19 +11,7 @@
 #include <qtermwidget.h>
 
 #include "app/Icons.h"
-
-namespace {
-
-QString expandTilde(const QString &path)
-{
-    if (path == "~")
-        return QDir::homePath();
-    if (path.startsWith("~/"))
-        return QDir::homePath() + path.mid(1);
-    return path;
-}
-
-} // namespace
+#include "sessions/SshArgs.h"
 
 TerminalWidget::TerminalWidget(QWidget *parent)
     : QWidget(parent)
@@ -168,22 +155,10 @@ void TerminalWidget::startLocalShell()
 
 void TerminalWidget::startSsh(const Session &s)
 {
-    QStringList args;
-    if (s.port != 0 && s.port != 22)
-        args << "-p" << QString::number(s.port);
-    if (!s.identityFile.isEmpty())
-        args << "-i" << expandTilde(s.identityFile);
-    if (!s.proxyJump.isEmpty())
-        args << "-J" << s.proxyJump;
+    QStringList args = SshArgs::gatewayArgs(s);
     if (s.forwardX11)
         args << "-X";
-    if (s.compression)
-        args << "-C";
-
-    if (!s.hostName.isEmpty())
-        args << s.target();
-    else
-        args << s.alias; // rely on ~/.ssh/config for the rest
+    args << SshArgs::targetArg(s);
 
     setTitle(s.displayName());
     startProgram(QStringLiteral("ssh"), args);
