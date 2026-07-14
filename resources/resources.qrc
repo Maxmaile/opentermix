@@ -25,6 +25,7 @@
         <file>icons/on-dark/split.svg</file>
         <file>icons/on-dark/tab-new.svg</file>
         <file>icons/on-dark/up.svg</file>
+        <file>icons/on-dark/upload.svg</file>
         <file>icons/on-dark/visible.svg</file>
         <file>icons/on-light/add.svg</file>
         <file>icons/on-light/clear.svg</file>
@@ -38,6 +39,7 @@
         <file>icons/on-light/split.svg</file>
         <file>icons/on-light/tab-new.svg</file>
         <file>icons/on-light/up.svg</file>
+        <file>icons/on-light/upload.svg</file>
         <file>icons/on-light/visible.svg</file>
     </qresource>
 </RCC>
