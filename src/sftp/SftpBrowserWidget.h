@@ -46,6 +46,7 @@ private slots:
     void goUp();
     void refresh();
     void downloadSelected();
+    void uploadSelected();
 
 private:
     void navigate(const QString &path);
@@ -62,6 +63,7 @@ private:
     QAction *upAction_ = nullptr;
     QAction *refreshAction_ = nullptr;
     QAction *downloadAction_ = nullptr;
+    QAction *uploadAction_ = nullptr;
     QAction *hiddenAction_ = nullptr;
     QString cwd_;
     bool connected_ = false;

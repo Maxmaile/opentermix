@@ -79,6 +79,36 @@ the parent directory. Install it with:
 sudo dpkg -i ../opentermix_*_amd64.deb
 ```
 
+### Runtime dependencies
+
+Installing the `.deb` pulls in:
+
+- `libc6 (>= 2.34)`, `libgcc-s1 (>= 3.0)`, `libstdc++6 (>= 5)` - standard C/C++ runtimes
+- `libqt6core6t64 (>= 6.8.2)`, `libqt6gui6 (>= 6.1.2)`, `libqt6widgets6 (>= 6.3.0)` - Qt 6 runtime
+- `libqtermwidget6-2 (>= 2.1.0)` - the embedded terminal widget
+- `libssh-4 (>= 0.8.0)` - SSH/SFTP support
+
+These minimum versions are computed by `dpkg-shlibdeps` from whatever Qt6/qtermwidget
+the package was built against, so they track the build machine, not the target.
+If you build on Debian sid/unstable, the resulting `.deb` will demand very recent
+library versions and can fail to install on older releases (e.g. Debian stable)
+with an "unmet dependencies" error.
+
+**Don't fix this by hand-editing the version numbers in `debian/control`.**
+Qt embeds a version-tagged symbol (`qt_version_tag`) in every binary tied to the
+exact Qt release it was compiled against; a binary built against Qt 6.10 cannot
+load against an older `libqt6core6t64`, no matter what the package metadata
+claims. Lowering the declared `Depends` only makes `dpkg` accept the install -
+the app then crashes on launch with something like:
+
+```
+libQt6Core.so.6: version `Qt_6.10' not found
+```
+
+To target an older distribution, build in a matching environment instead (a
+`debootstrap` chroot or container for that release, or the target machine
+itself) so the binary is actually linked against the older Qt6/qtermwidget.
+
 ## Layout
 
 ```

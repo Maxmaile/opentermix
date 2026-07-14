@@ -149,6 +149,7 @@ SftpBrowserWidget::SftpBrowserWidget(QWidget *parent)
     upAction_ = toolbar->addAction(tr("Up"), this, &SftpBrowserWidget::goUp);
     refreshAction_ = toolbar->addAction(tr("Refresh"), this, &SftpBrowserWidget::refresh);
     downloadAction_ = toolbar->addAction(tr("Download"), this, &SftpBrowserWidget::downloadSelected);
+    uploadAction_ = toolbar->addAction(tr("Upload"), this, &SftpBrowserWidget::uploadSelected);
     hiddenAction_ = toolbar->addAction(tr("Show hidden files"));
     hiddenAction_->setCheckable(true);
     hiddenAction_->setChecked(showHidden_);
@@ -156,6 +157,7 @@ SftpBrowserWidget::SftpBrowserWidget(QWidget *parent)
     upAction_->setToolTip(tr("Up"));
     refreshAction_->setToolTip(tr("Refresh"));
     downloadAction_->setToolTip(tr("Download"));
+    uploadAction_->setToolTip(tr("Upload"));
     connect(hiddenAction_, &QAction::toggled, this, [this](bool on) {
         showHidden_ = on;
         applyIcons(); // eye <-> eye-slash
@@ -209,6 +211,7 @@ void SftpBrowserWidget::applyIcons()
     upAction_->setIcon(Icons::action(QStringLiteral("up")));
     refreshAction_->setIcon(Icons::action(QStringLiteral("refresh")));
     downloadAction_->setIcon(Icons::action(QStringLiteral("download")));
+    uploadAction_->setIcon(Icons::action(QStringLiteral("upload")));
     // Eye when hidden files are shown, eye-with-slash when they are filtered out.
     hiddenAction_->setIcon(Icons::action(showHidden_ ? QStringLiteral("visible")
                                                      : QStringLiteral("hidden")));
@@ -448,6 +451,19 @@ void SftpBrowserWidget::downloadSelected()
             continue; // directories not supported yet
         const QString name = item->data(0, NameRole).toString();
         emit requestDownload(joinPath(cwd_, name), joinPath(dir, name));
+    }
+}
+
+void SftpBrowserWidget::uploadSelected()
+{
+    if (!connected_)
+        return;
+
+    const QStringList files = QFileDialog::getOpenFileNames(this, tr("Upload files"),
+                                                             QDir::homePath());
+    for (const QString &local : files) {
+        const QFileInfo info(local);
+        emit requestUpload(local, joinPath(cwd_, info.fileName()));
     }
 }
 
