@@ -82,6 +82,44 @@ the parent directory. Install it with:
 sudo dpkg -i ../opentermix_*_amd64.deb
 ```
 
+This works as-is only when run directly *on* a supported target (see below) -
+see "Runtime dependencies" for why a `.deb` built on one distro/release
+generally won't install or run on another.
+
+#### Supported targets
+
+OpenTermix needs a Qt6 build of `qtermwidget` (`libqtermwidget-dev` on
+Debian, `libqtermwidget6-2-dev` on Ubuntu - `debian/control` declares both
+as alternatives). That package doesn't exist yet on every deb-based release:
+
+- **Debian**: trixie (13) and newer. Older releases only have a Qt5 build.
+- **Ubuntu**: 26.04 "Resolute" and newer (25.10 "Questing" also has it).
+  **22.04 and 24.04 LTS are not supported** - Ubuntu freezes each release's
+  package set from a Debian snapshot months before release, and Debian's
+  `qtermwidget` didn't get its Qt6 port until December 2024, well after both
+  of those LTS freezes. Ubuntu doesn't backport new library versions into an
+  already-released LTS, so this isn't expected to change for them.
+- Derivatives (Mint, Pop!_OS, Zorin, ...) follow whichever Ubuntu/Debian base
+  they track.
+
+#### Cross-building for another target
+
+To build a `.deb` for a target other than the machine you're on, use
+`scripts/build-deb.sh`: it bootstraps a throwaway `debootstrap` chroot for
+that exact distro/release, builds inside it, and copies the resulting `.deb`
+back out - so the binary is always linked against that target's real Qt6/
+qtermwidget, not whatever happens to be installed locally.
+
+```bash
+sudo apt install debootstrap
+bash scripts/build-deb.sh debian trixie
+bash scripts/build-deb.sh ubuntu resolute
+```
+
+It needs `sudo` interactively (for `debootstrap`/`mount`/`chroot`), so run it
+in a real terminal rather than through an AI assistant's non-interactive
+shell.
+
 ### Runtime dependencies
 
 Installing the `.deb` pulls in:

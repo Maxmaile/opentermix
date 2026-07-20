@@ -3,7 +3,8 @@ Section: utils
 Priority: optional
 Maintainer: maile <maile@debian>
 Build-Depends: debhelper-compat (= 13), cmake (>= 3.18), g++ (>= 10),
- pkg-config, qt6-base-dev, qt6-tools-dev, qt6-l10n-tools, libqtermwidget-dev,
+ pkg-config, qt6-base-dev, qt6-tools-dev, qt6-l10n-tools,
+ libqtermwidget-dev | libqtermwidget6-2-dev,
  libutf8proc-dev, libssh-dev
 Standards-Version: 4.6.2
 Homepage: https://github.com/maile/opentermix

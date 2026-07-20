@@ -1,4 +1,4 @@
-opentermix (0.2.0-1) unstable; urgency=medium
+opentermix (0.2.0) unstable; urgency=medium
 
   * Add an Upload button to the SFTP browser, alongside a redrawn Download
     icon.
@@ -17,10 +17,17 @@ opentermix (0.2.0-1) unstable; urgency=medium
     by dpkg-shlibdeps); drop the stale debian/install file left over from
     before dh_auto_install started installing straight into
     debian/opentermix.
+  * Packaging: support building for Ubuntu (26.04+) in addition to Debian
+    (trixie+) - debian/control now accepts either qtermwidget dev package
+    name (libqtermwidget-dev | libqtermwidget6-2-dev), and
+    scripts/build-deb.sh generalizes the debootstrap-chroot build to any
+    Debian or Ubuntu target. Older Ubuntu releases (22.04, 24.04) aren't
+    supported: Ubuntu doesn't yet ship a Qt6 build of qtermwidget for them
+    and won't backport one into an already-released LTS.
 
  -- maile <maile@debian>  Mon, 20 Jul 2026 00:00:00 +0300
 
-opentermix (0.1.0-1) unstable; urgency=medium
+opentermix (0.1.0) unstable; urgency=medium
 
   * Initial release.
 
