@@ -6,6 +6,12 @@ opentermix (0.2.0-1) unstable; urgency=medium
     panel, with an active-tunnels tab next to terminal/Settings tabs.
   * Fix the terminal font defaulting to Bold Italic on first launch; font
     changes are now saved immediately instead of only on a clean exit.
+  * Fix ssh/sftp connections targeting the resolved HostName instead of the
+    ~/.ssh/config alias: any Host-block option not explicitly modeled by
+    OpenTermix (ProxyCommand, a non-default IdentityFile, ...) was silently
+    ignored, breaking connections that rely on it (e.g. routing through Tor,
+    or a per-host key) even though a manual `ssh <alias>` worked fine.
+    Affects terminals, tunnels, and the SFTP browser.
   * Packaging: add pkg-config to Build-Depends and qt6-svg-plugins to
     Depends (the SVG icon engine used by the toolbar icons isn't picked up
     by dpkg-shlibdeps); drop the stale debian/install file left over from

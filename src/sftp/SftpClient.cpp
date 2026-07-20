@@ -111,8 +111,13 @@ bool SftpClient::establish(const Session &session)
         return false;
     }
 
-    const QByteArray host = (session.hostName.isEmpty() ? session.alias
-                                                        : session.hostName)
+    // Match by the ssh_config alias (not the resolved HostName), so
+    // ssh_options_parse_config() below finds the same "Host <alias>" block a
+    // manual `ssh <alias>` would and fills in HostName/IdentityFile/
+    // ProxyCommand/etc. from it - see SshArgs::targetArg() for the same fix
+    // applied to the terminal/tunnel ssh invocations.
+    const QByteArray host = (session.alias.isEmpty() ? session.hostName
+                                                      : session.alias)
                                 .toUtf8();
     ssh_options_set(ssh_, SSH_OPTIONS_HOST, host.constData());
 
