@@ -29,7 +29,7 @@ QStringList gatewayArgs(const Session &s)
 
 QString targetArg(const Session &s)
 {
-    return s.hostName.isEmpty() ? s.alias : s.target();
+    return s.alias.isEmpty() ? s.target() : s.alias;
 }
 
 } // namespace SshArgs

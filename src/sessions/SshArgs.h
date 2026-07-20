@@ -16,8 +16,12 @@ QString expandTilde(const QString &path);
 // invocation for a Session needs, regardless of what runs afterwards.
 QStringList gatewayArgs(const Session &s);
 
-// The trailing target argument: "user@host", or just the alias if there is
-// no explicit HostName (relying on ~/.ssh/config to fill in the rest).
+// The trailing target argument: the ssh_config alias (Session::alias), so the
+// spawned `ssh` re-reads ~/.ssh/config and matches the same "Host <alias>"
+// block ssh itself would - picking up any directive we don't model as a
+// dedicated Session field (ProxyCommand, Ciphers, ServerAliveInterval, ...).
+// Falls back to "user@host" only if the session has no alias at all (should
+// not happen for a session read from a real config file).
 QString targetArg(const Session &s);
 
 } // namespace SshArgs
