@@ -3,14 +3,14 @@ Section: utils
 Priority: optional
 Maintainer: maile <maile@debian>
 Build-Depends: debhelper-compat (= 13), cmake (>= 3.18), g++ (>= 10),
- qt6-base-dev, qt6-tools-dev, qt6-l10n-tools, libqtermwidget-dev,
+ pkg-config, qt6-base-dev, qt6-tools-dev, qt6-l10n-tools, libqtermwidget-dev,
  libutf8proc-dev, libssh-dev
 Standards-Version: 4.6.2
 Homepage: https://github.com/maile/opentermix
 
 Package: opentermix
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, qt6-svg-plugins
 Description: Open-source lightweight MobaXterm-like terminal
  OpenTermix is an open-source, lightweight MobaXterm-like terminal
  for Linux. It provides tabbed embedded terminal (local shell and SSH),
