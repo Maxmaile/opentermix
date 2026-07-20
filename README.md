@@ -42,7 +42,7 @@ cross-platform packaging. X11 forwarding still works through `ssh -X`.
 On Debian (trixie/sid) / recent Ubuntu:
 
 ```bash
-sudo apt install cmake g++ qt6-base-dev libqtermwidget-dev libutf8proc-dev libssh-dev
+sudo apt install cmake g++ pkg-config qt6-base-dev libqtermwidget-dev libutf8proc-dev libssh-dev
 ```
 
 Notes:
@@ -51,6 +51,9 @@ Notes:
   `libqtermwidget6-dev`.
 - `libutf8proc-dev` is required because `qtermwidget6.pc` lists it as a
   dependency.
+- `pkg-config` is usually already present on a full desktop install, but a
+  minimal system (e.g. a fresh `debootstrap` chroot) may not have it -
+  `CMakeLists.txt` requires it (`find_package(PkgConfig REQUIRED)`).
 
 ### Compile
 
@@ -67,7 +70,7 @@ the packaging toolchain in addition to the build dependencies above, then
 build from the repository root:
 
 ```bash
-sudo apt install debhelper cmake g++ qt6-base-dev qt6-tools-dev qt6-l10n-tools \
+sudo apt install debhelper cmake g++ pkg-config qt6-base-dev qt6-tools-dev qt6-l10n-tools \
                  libqtermwidget-dev libutf8proc-dev libssh-dev
 dpkg-buildpackage -us -uc -b
 ```
@@ -87,6 +90,9 @@ Installing the `.deb` pulls in:
 - `libqt6core6t64 (>= 6.8.2)`, `libqt6gui6 (>= 6.1.2)`, `libqt6widgets6 (>= 6.3.0)` - Qt 6 runtime
 - `libqtermwidget6-2 (>= 2.1.0)` - the embedded terminal widget
 - `libssh-4 (>= 0.8.0)` - SSH/SFTP support
+- `qt6-svg-plugins` - the SVG icon engine plugin used to render the toolbar
+  icons (loaded at runtime via `QIcon`, so `dpkg-shlibdeps` can't auto-detect
+  it - declared explicitly in `debian/control` instead)
 
 These minimum versions are computed by `dpkg-shlibdeps` from whatever Qt6/qtermwidget
 the package was built against, so they track the build machine, not the target.

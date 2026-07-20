@@ -1,3 +1,19 @@
+opentermix (0.2.0-1) unstable; urgency=medium
+
+  * Add an Upload button to the SFTP browser, alongside a redrawn Download
+    icon.
+  * Add SSH port tunneling (Local/Remote/Dynamic-SOCKS) from the Sessions
+    panel, with an active-tunnels tab next to terminal/Settings tabs.
+  * Fix the terminal font defaulting to Bold Italic on first launch; font
+    changes are now saved immediately instead of only on a clean exit.
+  * Packaging: add pkg-config to Build-Depends and qt6-svg-plugins to
+    Depends (the SVG icon engine used by the toolbar icons isn't picked up
+    by dpkg-shlibdeps); drop the stale debian/install file left over from
+    before dh_auto_install started installing straight into
+    debian/opentermix.
+
+ -- maile <maile@debian>  Mon, 20 Jul 2026 00:00:00 +0300
+
 opentermix (0.1.0-1) unstable; urgency=medium
 
   * Initial release.
