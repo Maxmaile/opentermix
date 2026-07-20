@@ -43,6 +43,11 @@ MainWindow::MainWindow(QWidget *parent)
     // renders poorly, so fall back to a generic monospace family. A user choice
     // saved in QSettings overrides this in readSettings().
     terminalFont_ = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    // The platform's reported default fixed font can carry unwanted weight/style
+    // bits (seen as Bold Italic on some desktop themes) - normalize to a plain
+    // bold, non-italic default regardless of what the theme reports.
+    terminalFont_.setBold(true);
+    terminalFont_.setItalic(false);
     if (!QFontInfo(terminalFont_).fixedPitch()) {
         terminalFont_.setFamily(QStringLiteral("monospace"));
         terminalFont_.setStyleHint(QFont::Monospace);
@@ -271,6 +276,10 @@ void MainWindow::chooseFont()
     if (ok) {
         terminalFont_ = font;
         area_->setTerminalFont(font);
+        // Persist right away rather than only on a clean shutdown (closeEvent),
+        // so the choice survives a crash or a killed session too.
+        QSettings settings;
+        settings.setValue("ui/font", terminalFont_.toString());
     }
 }
 
