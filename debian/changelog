@@ -12,6 +12,18 @@ opentermix (0.2.0) unstable; urgency=medium
     ignored, breaking connections that rely on it (e.g. routing through Tor,
     or a per-host key) even though a manual `ssh <alias>` worked fine.
     Affects terminals, tunnels, and the SFTP browser.
+  * Fix the SFTP browser failing mid-session with "socket error: disconnected"
+    after sitting idle for a while: the connection was never kept alive, so a
+    NAT/firewall connection-tracking timeout (or the server's own idle
+    timeout) could silently drop it, only noticed on the next click. A
+    periodic no-op packet (the same trick ssh's ServerAliveInterval uses)
+    keeps the session - and the SFTP browser's own connection - alive.
+  * Fix editing a custom terminal color scheme's colors not visibly applying:
+    QTermWidget caches loaded color schemes by name for the process lifetime
+    with no way to force a reload, so overwriting an existing scheme's file
+    under the same name saved correctly but never showed up until a restart.
+    Editing an existing scheme in place now saves under a fresh name instead
+    (e.g. "MyScheme" -> "MyScheme_2"), which applies immediately.
   * Packaging: add pkg-config to Build-Depends and qt6-svg-plugins to
     Depends (the SVG icon engine used by the toolbar icons isn't picked up
     by dpkg-shlibdeps); drop the stale debian/install file left over from
@@ -25,10 +37,10 @@ opentermix (0.2.0) unstable; urgency=medium
     supported: Ubuntu doesn't yet ship a Qt6 build of qtermwidget for them
     and won't backport one into an already-released LTS.
 
- -- maile <maile@debian>  Mon, 20 Jul 2026 00:00:00 +0300
+ -- OpenTermix Contributors <opentermix@gmail.com>  Mon, 20 Jul 2026 00:00:00 +0300
 
 opentermix (0.1.0) unstable; urgency=medium
 
   * Initial release.
 
- -- maile <maile@debian>  Sun, 12 Jul 2026 00:00:00 +0300
+ -- OpenTermix Contributors <opentermix@gmail.com>  Sun, 12 Jul 2026 00:00:00 +0300

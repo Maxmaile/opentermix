@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QTimer>
 #include <QVector>
 
 #include <atomic>
@@ -55,6 +56,16 @@ signals:
     void transferFinished(QString name, bool ok);
     void keyDeployed(bool ok, QString message);
 
+private slots:
+    // A session left idle for a while (just browsing, no reads/writes) can be
+    // silently dropped by a NAT/firewall connection-tracking timeout or the
+    // server's own idle timeout; libssh only notices on the next real
+    // operation, which then fails with "socket error: disconnected" out of
+    // nowhere. Sending a periodic no-op packet - the same trick ssh's own
+    // ServerAliveInterval uses - keeps the connection (and any NAT mapping)
+    // alive so that doesn't happen.
+    void sendKeepalive();
+
 private:
     bool establish(const Session &session);
     bool verifyHost();
@@ -65,4 +76,5 @@ private:
     ssh_session ssh_ = nullptr;
     sftp_session sftp_ = nullptr;
     std::atomic_bool cancelled_{false};
+    QTimer *keepaliveTimer_;
 };

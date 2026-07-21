@@ -13,7 +13,10 @@ const int kBufferSize = 32 * 1024;
 
 SftpClient::SftpClient(QObject *parent)
     : QObject(parent)
+    , keepaliveTimer_(new QTimer(this))
 {
+    keepaliveTimer_->setInterval(30000);
+    connect(keepaliveTimer_, &QTimer::timeout, this, &SftpClient::sendKeepalive);
 }
 
 SftpClient::~SftpClient()
@@ -23,6 +26,7 @@ SftpClient::~SftpClient()
 
 void SftpClient::closeAll()
 {
+    keepaliveTimer_->stop();
     if (sftp_) {
         sftp_free(sftp_);
         sftp_ = nullptr;
@@ -33,6 +37,12 @@ void SftpClient::closeAll()
         ssh_free(ssh_);
         ssh_ = nullptr;
     }
+}
+
+void SftpClient::sendKeepalive()
+{
+    if (ssh_ && ssh_is_connected(ssh_))
+        ssh_send_ignore(ssh_, "");
 }
 
 bool SftpClient::verifyHost()
@@ -152,6 +162,7 @@ bool SftpClient::establish(const Session &session)
         return false;
     }
 
+    keepaliveTimer_->start();
     return true;
 }
 

@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QVBoxLayout>
 
@@ -136,8 +137,37 @@ void SettingsWidget::customizeScheme()
     if (dlg.exec() != QDialog::Accepted)
         return;
 
-    const QString newName = dlg.schemeName();
+    QString newName = dlg.schemeName();
     const TermColorScheme edited = dlg.scheme();
+
+    // QTermWidget's ColorSchemeManager caches a scheme's colours by name for
+    // the whole process and has no public way to make it re-read a changed
+    // file - it returns the cached copy as soon as a name has been seen once,
+    // which happens the moment this dropdown is first populated. Overwriting
+    // an existing scheme's file under the same name (editing a custom scheme
+    // in place, which keeps its name fixed - see the dialog's nameEditable
+    // argument above) would therefore save correctly but not visibly apply
+    // until the app restarts. Work around it by saving under a name
+    // qtermwidget has never seen and dropping the stale file.
+    if (ColorSchemeStore::isCustom(newName)) {
+        static const QRegularExpression suffixRe(QStringLiteral("_[0-9]+$"));
+        const QString oldName = newName;
+        QString base = oldName;
+        base.remove(suffixRe);
+        int suffix = 2;
+        do {
+            newName = QStringLiteral("%1_%2").arg(base).arg(suffix++);
+        } while (ColorSchemeStore::isCustom(newName));
+
+        ColorSchemeStore::remove(oldName);
+        QMessageBox::information(
+            this, tr("Color scheme"),
+            tr("The terminal library keeps loaded color schemes in memory, so "
+              "editing \"%1\" in place would not show up until a restart. "
+              "Saved the new colors as \"%2\" instead, applied right away.")
+                .arg(oldName, newName));
+    }
+
     const QString path = ColorSchemeStore::save(newName, edited);
     if (path.isEmpty()) {
         QMessageBox::warning(this, tr("Color scheme"),
