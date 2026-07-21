@@ -7,7 +7,7 @@ Build-Depends: debhelper-compat (= 13), cmake (>= 3.18), g++ (>= 10),
  libqtermwidget-dev | libqtermwidget6-2-dev,
  libutf8proc-dev, libssh-dev
 Standards-Version: 4.6.2
-Homepage: https://github.com/maile/opentermix
+Homepage: https://github.com/Maxmaile/opentermix
 
 Package: opentermix
 Architecture: any

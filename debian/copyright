@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: OpenTermix
-Source: https://github.com/maile/opentermix
+Source: https://github.com/Maxmaile/opentermix
 
 Files: *
 Copyright: 2026 OpenTermix Contributors
