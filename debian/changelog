@@ -1,3 +1,14 @@
+opentermix (0.2.1) unstable; urgency=medium
+
+  * Scrub personal maintainer name/email from packaging metadata
+    (debian/control, debian/copyright, debian/changelog) in favor of a
+    generic project identity.
+  * Fix debian/control's Homepage and debian/copyright's Source pointing at
+    a stale github.com/maile URL instead of the real
+    github.com/Maxmaile/opentermix.
+
+ -- OpenTermix Contributors <opentermix@gmail.com>  Tue, 21 Jul 2026 00:00:00 +0300
+
 opentermix (0.2.0) unstable; urgency=medium
 
   * Add an Upload button to the SFTP browser, alongside a redrawn Download
